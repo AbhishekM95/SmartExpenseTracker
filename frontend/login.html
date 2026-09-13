@@ -4,18 +4,15 @@
 
 <head>
 
-```
-<title>Login - Smart Expense Tracker</title>
+<title>Login - Smart Personal Expense Tracker</title>
 
 <link rel="stylesheet"
       href="css/style.css">
-```
 
 </head>
 
 <body>
 
-```
 <h1>Login</h1>
 
 
@@ -74,10 +71,9 @@
 <a href="index.html">
     Back to Home
 </a>
-```
+
 
 <script>
-
 
 // =====================================
 // LOGIN
@@ -115,7 +111,7 @@ document.getElementById("loginForm").addEventListener(
 
             const response =
                 await fetch(
-                    "http://https://smartexpensetracker-6oc9.onrender.com/login",
+                    "https://smartexpensetracker-6oc9.onrender.com/login",
                     {
                         method: "POST",
 
@@ -180,8 +176,6 @@ document.getElementById("loginForm").addEventListener(
 
                 // User name is not returned
                 // by the current login server.
-                // We will display email if name
-                // is not available.
 
                 if (
                     !localStorage.getItem(
@@ -227,13 +221,13 @@ document.getElementById("loginForm").addEventListener(
             ).innerText =
                 "Cannot connect to Java server.";
 
-
         }
 
     }
 );
 
 </script>
+
 
 </body>
 
