@@ -334,7 +334,7 @@ async function loadMonthlySummary() {
     try {
 
         const url =
-            "http://localhost:8081/monthly-summary"
+            "http://https://smartexpensetracker-6oc9.onrender.com/monthly-summary"
             + "?userId="
             + encodeURIComponent(userId)
             + "&month="
@@ -469,7 +469,7 @@ async function loadReports() {
 
         const response =
             await fetch(
-                "http://localhost:8081/reports",
+                "http://https://smartexpensetracker-6oc9.onrender.com/reports",
                 {
                     method: "POST",
 
