@@ -1,0 +1,1866 @@
+```html
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>All Transactions - Smart Expense Tracker</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+
+<style>
+
+/* =========================================================
+   TRANSACTION ACTIONS
+   ========================================================= */
+
+.transaction-content {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.5;
+}
+
+.transaction-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.transaction-actions button {
+    margin: 0;
+    padding: 7px 14px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   ========================================================= */
+
+.view-button {
+    background: #673ab7;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.view-button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   EDIT BUTTON
+   ========================================================= */
+
+.edit-button {
+    background: #2196f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.delete-button {
+    background: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   EDIT FORM
+   ========================================================= */
+
+#editSection {
+    display: none;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.edit-form label {
+    font-weight: bold;
+}
+
+.edit-form input,
+.edit-form select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.save-button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: #777;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   VIEW TRANSACTION DETAILS
+   ========================================================= */
+
+#viewSection {
+    display: none;
+    text-align: left;
+}
+
+#viewSection h2 {
+    text-align: center;
+}
+
+#viewSection p {
+    margin: 12px 0;
+    padding: 10px;
+    background: #f7f7f7;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+#viewSection strong {
+    display: inline-block;
+    min-width: 150px;
+}
+
+.close-view-button {
+    background: #777;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 500px) {
+
+    .transaction-actions {
+        width: 100%;
+        margin-top: 12px;
+    }
+
+    .transaction-actions button {
+        flex: 1;
+        min-width: 90px;
+    }
+
+    #viewSection p {
+        font-size: 15px;
+    }
+
+    #viewSection strong {
+        display: block;
+        min-width: auto;
+        margin-bottom: 4px;
+    }
+
+    .edit-buttons {
+        flex-direction: column;
+    }
+
+    .edit-buttons button {
+        width: 100%;
+        margin: 3px 0;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+<h1>🧾 All Transactions</h1>
+
+<p>
+    View and search all your income and expenses.
+</p>
+
+
+<!-- =========================================================
+     TRANSACTION SUMMARY
+     ========================================================= -->
+
+<h2>📊 Transaction Summary</h2>
+
+
+<div class="summary-cards">
+
+
+    <div class="summary-card">
+
+        <h3>📈 Total Income</h3>
+
+        <p id="totalIncome">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <h3>📉 Total Expenses</h3>
+
+        <p id="totalExpense">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <h3>💰 Balance</h3>
+
+        <p id="balance">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <h3>🔢 Transactions</h3>
+
+        <p id="transactionCount">
+            0
+        </p>
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     SEARCH AND FILTERS
+     ========================================================= -->
+
+<div class="dashboard-section">
+
+    <h2>🔎 Search & Filter</h2>
+
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Search description..."
+        oninput="filterTransactions()"
+    >
+
+
+    <br><br>
+
+
+    <select
+        id="type"
+        onchange="filterTransactions()"
+    >
+
+        <option value="ALL">
+            All Transactions
+        </option>
+
+        <option value="INCOME">
+            Income
+        </option>
+
+        <option value="EXPENSE">
+            Expense
+        </option>
+
+    </select>
+
+
+    <select
+        id="category"
+        onchange="filterTransactions()"
+    >
+
+        <option value="ALL">
+            All Categories
+        </option>
+
+        <option value="Food">
+            Food
+        </option>
+
+        <option value="Shopping">
+            Shopping
+        </option>
+
+        <option value="Transport">
+            Transport
+        </option>
+
+        <option value="Education">
+            Education
+        </option>
+
+        <option value="Health">
+            Health
+        </option>
+
+        <option value="Entertainment">
+            Entertainment
+        </option>
+
+        <option value="Other">
+            Other
+        </option>
+
+        <option value="Salary">
+            Salary
+        </option>
+
+        <option value="Freelancing">
+            Freelancing
+        </option>
+
+        <option value="Business">
+            Business
+        </option>
+
+        <option value="Investment">
+            Investment
+        </option>
+
+    </select>
+
+
+    <br><br>
+
+
+    <button onclick="clearFilters()">
+        🔄 Clear Filters
+    </button>
+
+
+</div>
+
+
+<!-- =========================================================
+     VIEW TRANSACTION DETAILS
+     ========================================================= -->
+
+<div
+    class="dashboard-section"
+    id="viewSection"
+>
+
+    <h2>👁️ Transaction Details</h2>
+
+
+    <p>
+
+        <strong>Transaction ID:</strong>
+
+        <span id="viewId"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Type:</strong>
+
+        <span id="viewType"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Category:</strong>
+
+        <span id="viewCategory"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Amount:</strong>
+
+        <span id="viewAmount"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Date:</strong>
+
+        <span id="viewDate"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Description:</strong>
+
+        <span id="viewDescription"></span>
+
+    </p>
+
+
+    <button
+        class="close-view-button"
+        onclick="closeViewDetails()"
+    >
+        ❌ Close
+    </button>
+
+
+</div>
+
+
+<!-- =========================================================
+     EDIT TRANSACTION
+     ========================================================= -->
+
+<div
+    class="dashboard-section"
+    id="editSection"
+>
+
+    <h2>✏️ Edit Transaction</h2>
+
+
+    <div class="edit-form">
+
+
+        <label>
+            Transaction Type
+        </label>
+
+
+        <input
+            type="text"
+            id="editType"
+            readonly
+        >
+
+
+        <label>
+            Category
+        </label>
+
+
+        <select id="editCategory">
+
+            <!-- EXPENSE CATEGORIES -->
+
+            <option value="1">
+                Food
+            </option>
+
+            <option value="2">
+                Shopping
+            </option>
+
+            <option value="3">
+                Transport
+            </option>
+
+            <option value="4">
+                Education
+            </option>
+
+            <option value="5">
+                Health
+            </option>
+
+            <option value="6">
+                Entertainment
+            </option>
+
+            <option value="7">
+                Other
+            </option>
+
+
+            <!-- INCOME CATEGORIES -->
+
+            <option value="8">
+                Salary
+            </option>
+
+            <option value="9">
+                Freelancing
+            </option>
+
+            <option value="10">
+                Business
+            </option>
+
+            <option value="11">
+                Investment
+            </option>
+
+            <option value="12">
+                Other
+            </option>
+
+        </select>
+
+
+        <label>
+            Amount
+        </label>
+
+
+        <input
+            type="number"
+            id="editAmount"
+            min="0.01"
+            step="0.01"
+        >
+
+
+        <label>
+            Date
+        </label>
+
+
+        <input
+            type="date"
+            id="editDate"
+        >
+
+
+        <label>
+            Description
+        </label>
+
+
+        <input
+            type="text"
+            id="editDescription"
+            maxlength="255"
+            placeholder="Enter description"
+        >
+
+
+        <div class="edit-buttons">
+
+
+            <button
+                class="save-button"
+                onclick="saveEdit()"
+            >
+                💾 Save Changes
+            </button>
+
+
+            <button
+                class="cancel-button"
+                onclick="cancelEdit()"
+            >
+                ❌ Cancel
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TRANSACTION HISTORY
+     ========================================================= -->
+
+<div class="dashboard-section">
+
+
+    <h2>📋 Transaction History</h2>
+
+
+    <div id="transactions">
+
+        Loading transactions...
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     BACK BUTTON
+     ========================================================= -->
+
+<div class="report-back">
+
+    <button onclick="goToDashboard()">
+
+        ← Back to Dashboard
+
+    </button>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+// =========================================================
+// CURRENT TRANSACTION BEING EDITED
+// =========================================================
+
+let editingId = 0;
+
+let editingType = "";
+
+
+// =========================================================
+// CATEGORY NAME → CATEGORY ID
+// =========================================================
+// Handles the two different "Other" categories correctly.
+// Expense Other = ID 7
+// Income Other  = ID 12
+// =========================================================
+
+function getCategoryId(category, type) {
+
+
+    const expenseCategoryMap = {
+
+        "Food": 1,
+
+        "Shopping": 2,
+
+        "Transport": 3,
+
+        "Education": 4,
+
+        "Health": 5,
+
+        "Entertainment": 6,
+
+        "Other": 7
+
+    };
+
+
+    const incomeCategoryMap = {
+
+        "Salary": 8,
+
+        "Freelancing": 9,
+
+        "Business": 10,
+
+        "Investment": 11,
+
+        "Other": 12
+
+    };
+
+
+    if (type === "EXPENSE") {
+
+        return expenseCategoryMap[category] || 7;
+
+    }
+
+
+    return incomeCategoryMap[category] || 12;
+
+}
+
+
+// =========================================================
+// LOAD FILTERED TRANSACTIONS
+// =========================================================
+
+async function filterTransactions() {
+
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        alert("Please login first.");
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    const type =
+        document.getElementById(
+            "type"
+        ).value;
+
+
+    const category =
+        document.getElementById(
+            "category"
+        ).value;
+
+
+    const search =
+        document.getElementById(
+            "search"
+        ).value;
+
+
+    const data =
+        "userId=" +
+        encodeURIComponent(userId) +
+
+        "&type=" +
+        encodeURIComponent(type) +
+
+        "&category=" +
+        encodeURIComponent(category) +
+
+        "&search=" +
+        encodeURIComponent(search);
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "http://localhost:8081/filter-transactions",
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+
+                    },
+
+                    body: data
+
+                }
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Filtered transactions:",
+            result
+        );
+
+
+        const transactionsDiv =
+            document.getElementById(
+                "transactions"
+            );
+
+
+        transactionsDiv.innerHTML = "";
+
+
+        if (result.trim() === "") {
+
+
+            transactionsDiv.innerText =
+                "No transactions found.";
+
+
+            updateSummary(
+                0,
+                0,
+                0,
+                0
+            );
+
+
+            return;
+
+        }
+
+
+        const rows =
+            result.trim().split("\n");
+
+
+        let totalIncome = 0;
+
+        let totalExpense = 0;
+
+        let transactionCount = 0;
+
+
+        rows.forEach(function(row) {
+
+
+            if (row.trim() === "") {
+
+                return;
+
+            }
+
+
+            // =================================================
+            // EXPECTED FORMAT:
+            //
+            // ID|TYPE|CATEGORY|AMOUNT|DATE|DESCRIPTION
+            // =================================================
+
+            const parts =
+                row.split("|");
+
+
+            const id =
+                parseInt(parts[0]);
+
+
+            const transactionType =
+                parts[1];
+
+
+            const category =
+                parts[2];
+
+
+            const amount =
+                parseFloat(parts[3]) || 0;
+
+
+            const date =
+                parts[4];
+
+
+            const description =
+                parts.slice(5).join("|") || "";
+
+
+            // =================================================
+            // CALCULATE SUMMARY
+            // =================================================
+
+            if (
+                transactionType ===
+                "INCOME"
+            ) {
+
+                totalIncome =
+                    totalIncome + amount;
+
+            }
+
+            else {
+
+                totalExpense =
+                    totalExpense + amount;
+
+            }
+
+
+            transactionCount =
+                transactionCount + 1;
+
+
+            // =================================================
+            // CREATE TRANSACTION CONTAINER
+            // =================================================
+
+            const transaction =
+                document.createElement(
+                    "div"
+                );
+
+
+            transaction.className =
+                "transaction-item";
+
+
+            // =================================================
+            // TRANSACTION TEXT
+            // =================================================
+
+            const transactionContent =
+                document.createElement(
+                    "div"
+                );
+
+
+            transactionContent.className =
+                "transaction-content";
+
+
+            if (
+                transactionType ===
+                "INCOME"
+            ) {
+
+                transactionContent.innerText =
+                    "📈 " +
+                    category +
+                    "  + ₹" +
+                    amount.toFixed(2) +
+                    "  (" +
+                    date +
+                    ")" +
+                    (
+                        description
+                            ? " - " +
+                              description
+                            : ""
+                    );
+
+            }
+
+            else {
+
+                transactionContent.innerText =
+                    "📉 " +
+                    category +
+                    "  − ₹" +
+                    amount.toFixed(2) +
+                    "  (" +
+                    date +
+                    ")" +
+                    (
+                        description
+                            ? " - " +
+                              description
+                            : ""
+                    );
+
+            }
+
+
+            transaction.appendChild(
+                transactionContent
+            );
+
+
+            // =================================================
+            // ACTION BUTTONS
+            // =================================================
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+
+            actions.className =
+                "transaction-actions";
+
+
+            // =================================================
+            // VIEW BUTTON
+            // =================================================
+
+            const viewButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            viewButton.className =
+                "view-button";
+
+
+            viewButton.innerText =
+                "👁️ View";
+
+
+            viewButton.onclick =
+                function() {
+
+                    viewTransaction(
+                        id,
+                        transactionType,
+                        category,
+                        amount,
+                        date,
+                        description
+                    );
+
+                };
+
+
+            // =================================================
+            // EDIT BUTTON
+            // =================================================
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            editButton.className =
+                "edit-button";
+
+
+            editButton.innerText =
+                "✏️ Edit";
+
+
+            editButton.onclick =
+                function() {
+
+                    openEditForm(
+                        id,
+                        transactionType,
+                        category,
+                        amount,
+                        date,
+                        description
+                    );
+
+                };
+
+
+            // =================================================
+            // DELETE BUTTON
+            // =================================================
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            deleteButton.className =
+                "delete-button";
+
+
+            deleteButton.innerText =
+                "🗑️ Delete";
+
+
+            deleteButton.onclick =
+                function() {
+
+                    deleteTransaction(
+                        id,
+                        transactionType
+                    );
+
+                };
+
+
+            // =================================================
+            // ADD BUTTONS
+            // =================================================
+
+            actions.appendChild(
+                viewButton
+            );
+
+
+            actions.appendChild(
+                editButton
+            );
+
+
+            actions.appendChild(
+                deleteButton
+            );
+
+
+            transaction.appendChild(
+                actions
+            );
+
+
+            transactionsDiv.appendChild(
+                transaction
+            );
+
+
+        });
+
+
+        // =================================================
+        // UPDATE SUMMARY
+        // =================================================
+
+        const balance =
+            totalIncome -
+            totalExpense;
+
+
+        updateSummary(
+            totalIncome,
+            totalExpense,
+            balance,
+            transactionCount
+        );
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Error filtering transactions:",
+            error
+        );
+
+
+        document.getElementById(
+            "transactions"
+        ).innerText =
+            "Cannot connect to Java server.";
+
+    }
+
+}
+
+
+// =========================================================
+// UPDATE SUMMARY
+// =========================================================
+
+function updateSummary(
+    totalIncome,
+    totalExpense,
+    balance,
+    transactionCount
+) {
+
+
+    document.getElementById(
+        "totalIncome"
+    ).innerText =
+        "₹" +
+        totalIncome.toFixed(2);
+
+
+    document.getElementById(
+        "totalExpense"
+    ).innerText =
+        "₹" +
+        totalExpense.toFixed(2);
+
+
+    document.getElementById(
+        "balance"
+    ).innerText =
+        "₹" +
+        balance.toFixed(2);
+
+
+    document.getElementById(
+        "transactionCount"
+    ).innerText =
+        transactionCount || 0;
+
+}
+
+
+// =========================================================
+// VIEW TRANSACTION DETAILS
+// =========================================================
+
+function viewTransaction(
+    id,
+    type,
+    category,
+    amount,
+    date,
+    description
+) {
+
+
+    document.getElementById(
+        "viewId"
+    ).innerText =
+        id;
+
+
+    document.getElementById(
+        "viewType"
+    ).innerText =
+        type;
+
+
+    document.getElementById(
+        "viewCategory"
+    ).innerText =
+        category;
+
+
+    document.getElementById(
+        "viewAmount"
+    ).innerText =
+        "₹" +
+        amount.toFixed(2);
+
+
+    document.getElementById(
+        "viewDate"
+    ).innerText =
+        date;
+
+
+    document.getElementById(
+        "viewDescription"
+    ).innerText =
+        description ||
+        "No description";
+
+
+    document.getElementById(
+        "viewSection"
+    ).style.display =
+        "block";
+
+
+    // Close edit form if open
+
+    document.getElementById(
+        "editSection"
+    ).style.display =
+        "none";
+
+
+    // Scroll to details
+
+    document.getElementById(
+        "viewSection"
+    ).scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+// =========================================================
+// CLOSE VIEW DETAILS
+// =========================================================
+
+function closeViewDetails() {
+
+
+    document.getElementById(
+        "viewSection"
+    ).style.display =
+        "none";
+
+}
+
+
+// =========================================================
+// OPEN EDIT FORM
+// =========================================================
+
+function openEditForm(
+    id,
+    type,
+    category,
+    amount,
+    date,
+    description
+) {
+
+
+    editingId = id;
+
+    editingType = type;
+
+
+    document.getElementById(
+        "editSection"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "viewSection"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "editType"
+    ).value =
+        type;
+
+
+    // Correctly handle Other for
+    // EXPENSE and INCOME
+
+    document.getElementById(
+        "editCategory"
+    ).value =
+        getCategoryId(
+            category,
+            type
+        );
+
+
+    document.getElementById(
+        "editAmount"
+    ).value =
+        amount;
+
+
+    document.getElementById(
+        "editDate"
+    ).value =
+        date;
+
+
+    document.getElementById(
+        "editDescription"
+    ).value =
+        description;
+
+
+    // =====================================================
+    // SHOW ONLY RELEVANT CATEGORIES
+    // =====================================================
+
+    const categorySelect =
+        document.getElementById(
+            "editCategory"
+        );
+
+
+    const options =
+        categorySelect.options;
+
+
+    for (
+        let i = 0;
+        i < options.length;
+        i++
+    ) {
+
+
+        const categoryId =
+            parseInt(
+                options[i].value
+            );
+
+
+        if (
+            editingType ===
+            "EXPENSE"
+        ) {
+
+
+            options[i].style.display =
+                categoryId >= 1 &&
+                categoryId <= 7
+                    ? ""
+                    : "none";
+
+        }
+
+        else {
+
+
+            options[i].style.display =
+                categoryId >= 8 &&
+                categoryId <= 12
+                    ? ""
+                    : "none";
+
+        }
+
+    }
+
+
+    // =====================================================
+    // SCROLL TO EDIT FORM
+    // =====================================================
+
+    document.getElementById(
+        "editSection"
+    ).scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+// =========================================================
+// SAVE EDIT
+// =========================================================
+
+async function saveEdit() {
+
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        alert("Please login first.");
+
+        return;
+
+    }
+
+
+    const categoryId =
+        document.getElementById(
+            "editCategory"
+        ).value;
+
+
+    const amount =
+        document.getElementById(
+            "editAmount"
+        ).value;
+
+
+    const date =
+        document.getElementById(
+            "editDate"
+        ).value;
+
+
+    const description =
+        document.getElementById(
+            "editDescription"
+        ).value;
+
+
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    if (
+        !amount ||
+        parseFloat(amount) <= 0
+    ) {
+
+        alert(
+            "Please enter a valid amount."
+        );
+
+        return;
+
+    }
+
+
+    if (!date) {
+
+        alert(
+            "Please select a date."
+        );
+
+        return;
+
+    }
+
+
+    const endpoint =
+        editingType === "EXPENSE"
+            ? "update-expense"
+            : "update-income";
+
+
+    const data =
+        "id=" +
+        encodeURIComponent(editingId) +
+
+        "&userId=" +
+        encodeURIComponent(userId) +
+
+        "&categoryId=" +
+        encodeURIComponent(categoryId) +
+
+        "&amount=" +
+        encodeURIComponent(amount) +
+
+        "&date=" +
+        encodeURIComponent(date) +
+
+        "&description=" +
+        encodeURIComponent(description);
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "http://localhost:8081/" +
+                endpoint,
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+
+                    },
+
+                    body: data
+
+                }
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Update response:",
+            result
+        );
+
+
+        if (
+            result.includes(
+                "successfully"
+            )
+        ) {
+
+
+            alert(result);
+
+
+            cancelEdit();
+
+
+            // Reload transactions
+
+            filterTransactions();
+
+        }
+
+        else {
+
+            alert(result);
+
+        }
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Error updating transaction:",
+            error
+        );
+
+
+        alert(
+            "Cannot connect to Java server."
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// CANCEL EDIT
+// =========================================================
+
+function cancelEdit() {
+
+
+    editingId = 0;
+
+    editingType = "";
+
+
+    document.getElementById(
+        "editSection"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "editAmount"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "editDate"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "editDescription"
+    ).value =
+        "";
+
+}
+
+
+// =========================================================
+// DELETE TRANSACTION
+// =========================================================
+
+async function deleteTransaction(
+    id,
+    type
+) {
+
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        alert("Please login first.");
+
+        return;
+
+    }
+
+
+    // =====================================================
+    // CONFIRMATION
+    // =====================================================
+
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this " +
+            type.toLowerCase() +
+            " transaction?"
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    const endpoint =
+        type === "EXPENSE"
+            ? "delete-expense"
+            : "delete-income";
+
+
+    const data =
+        "id=" +
+        encodeURIComponent(id) +
+
+        "&userId=" +
+        encodeURIComponent(userId);
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "http://localhost:8081/" +
+                endpoint,
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+
+                    },
+
+                    body: data
+
+                }
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Delete response:",
+            result
+        );
+
+
+        if (
+            result.includes(
+                "successfully"
+            )
+        ) {
+
+
+            alert(result);
+
+
+            // Reload transactions
+
+            filterTransactions();
+
+        }
+
+        else {
+
+            alert(result);
+
+        }
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Error deleting transaction:",
+            error
+        );
+
+
+        alert(
+            "Cannot connect to Java server."
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// CLEAR FILTERS
+// =========================================================
+
+function clearFilters() {
+
+
+    document.getElementById(
+        "search"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "type"
+    ).value =
+        "ALL";
+
+
+    document.getElementById(
+        "category"
+    ).value =
+        "ALL";
+
+
+    filterTransactions();
+
+}
+
+
+// =========================================================
+// BACK TO DASHBOARD
+// =========================================================
+
+function goToDashboard() {
+
+
+    window.location.href =
+        "dashboard.html";
+
+}
+
+
+// =========================================================
+// START PAGE
+// =========================================================
+
+filterTransactions();
+
+
+</script>
+
+
+</body>
+
+</html>
+```

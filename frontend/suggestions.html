@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Spending Suggestions</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>💡 Spending Suggestions</h1>
+
+        <p>Personalized suggestions based on your spending.</p>
+
+        <div id="suggestionsBox">
+            <p>Loading suggestions...</p>
+        </div>
+
+        <br>
+
+        <button onclick="goToDashboard()">
+            ← Back to Dashboard
+        </button>
+
+    </div>
+
+
+    <script>
+
+        // Get logged-in user ID
+        const userId = localStorage.getItem("userId");
+
+
+        // Check login
+        if (!userId) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+        }
+
+
+        // Load suggestions
+        function loadSuggestions() {
+
+            fetch("http://localhost:8081/suggestions", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+
+                body: "userId=" + encodeURIComponent(userId)
+
+            })
+
+            .then(response => response.text())
+
+            .then(data => {
+
+                const suggestionsBox =
+                    document.getElementById("suggestionsBox");
+
+                suggestionsBox.innerHTML = "";
+
+
+                // Split suggestions by newline
+                const suggestions =
+                    data.trim().split("\n");
+
+
+                suggestions.forEach(function(suggestion) {
+
+                    const div =
+                        document.createElement("div");
+
+                    div.className = "suggestion";
+
+                    div.textContent = suggestion;
+
+                    suggestionsBox.appendChild(div);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Error loading suggestions:",
+                    error
+                );
+
+                document.getElementById(
+                    "suggestionsBox"
+                ).innerHTML =
+                    "<p>Unable to load suggestions.</p>";
+
+            });
+        }
+
+
+        // Go back to dashboard
+        function goToDashboard() {
+
+            window.location.href =
+                "dashboard.html";
+        }
+
+
+        // Load suggestions when page opens
+        loadSuggestions();
+
+    </script>
+
+</body>
+
+</html>

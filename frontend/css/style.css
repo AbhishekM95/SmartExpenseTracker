@@ -1,0 +1,540 @@
+
+/* =========================================================
+   GENERAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background: #f4f6f8;
+    color: #222;
+}
+
+h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+h3 {
+    margin-bottom: 8px;
+}
+
+p {
+    font-size: 18px;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 25px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+button {
+    padding: 11px 20px;
+    margin: 6px;
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
+    background: #333;
+    color: white;
+    font-size: 15px;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   INPUTS / FORMS
+   ========================================================= */
+
+input {
+    padding: 10px;
+    width: 250px;
+    margin-top: 5px;
+}
+
+input[type="number"],
+input[type="date"] {
+    padding: 10px;
+    width: 250px;
+}
+
+select {
+    padding: 10px;
+    width: 270px;
+}
+
+textarea {
+    padding: 10px;
+    resize: vertical;
+}
+
+form {
+    margin-top: 30px;
+}
+
+
+/* =========================================================
+   DASHBOARD HEADER
+   ========================================================= */
+
+.container > h1 {
+    text-align: center;
+}
+
+.container > p {
+    text-align: center;
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+.container > a:first-of-type {
+    display: block;
+    text-align: right;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   FINANCIAL SUMMARY
+   ========================================================= */
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    margin: 20px 0 30px;
+}
+
+.summary-card {
+    width: 100%;
+    min-height: 140px;
+
+    padding: 25px 15px;
+
+    margin: 0;
+
+    background: white;
+
+    border: none;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+.summary-card h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+.summary-card p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   QUICK ACTIONS
+   ========================================================= */
+
+.dashboard-section {
+    width: 100%;
+
+    margin: 25px 0;
+
+    padding: 25px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-section h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.dashboard-actions {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+
+    width: 100%;
+}
+
+.dashboard-actions a {
+    display: block;
+    width: 100%;
+}
+
+.dashboard-actions button {
+    width: 100%;
+    margin: 0;
+}
+
+
+/* =========================================================
+   RECENT TRANSACTIONS
+   ========================================================= */
+
+#transactions {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.transaction-item {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 14px 10px;
+
+    margin: 0;
+
+    border: none;
+
+    border-bottom: 1px solid #e5e5e5;
+
+    background: transparent;
+
+    border-radius: 0;
+
+    box-shadow: none;
+
+    text-align: left;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   TRANSACTION CONTENT
+   ========================================================= */
+
+.transaction-content {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   TRANSACTION ACTIONS
+   ========================================================= */
+
+.transaction-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.transaction-actions button {
+    margin: 0;
+    padding: 7px 14px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   ========================================================= */
+
+.view-button {
+    background: #673ab7;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.view-button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   EDIT BUTTON
+   ========================================================= */
+
+.edit-button {
+    background: #2196f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.delete-button {
+    background: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   EDIT TRANSACTION SECTION
+   ========================================================= */
+
+#editSection {
+    display: none;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.edit-form label {
+    font-weight: bold;
+}
+
+.edit-form input,
+.edit-form select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.save-button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: #777;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   VIEW TRANSACTION DETAILS
+   ========================================================= */
+
+#viewSection {
+    display: none;
+    text-align: left;
+}
+
+#viewSection h2 {
+    text-align: center;
+}
+
+#viewSection p {
+    margin: 12px 0;
+    padding: 10px;
+    background: #f7f7f7;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+#viewSection strong {
+    display: inline-block;
+    min-width: 150px;
+}
+
+
+/* =========================================================
+   SPENDING SUGGESTIONS
+   ========================================================= */
+
+#suggestionsBox {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.suggestion {
+    width: 100%;
+
+    padding: 15px;
+
+    margin: 0 0 12px;
+
+    background: #f5f5f5;
+
+    border-radius: 10px;
+
+    border-left: 5px solid #4CAF50;
+
+    font-size: 16px;
+
+    line-height: 1.5;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   REPORT / BACK BUTTON
+   ========================================================= */
+
+.report-back {
+    margin-top: 25px;
+}
+
+.report-back button {
+    margin: 6px;
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE DESIGN
+   ========================================================= */
+
+@media (max-width: 500px) {
+
+    .container {
+        width: 95%;
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .container > a:first-of-type {
+        text-align: center;
+    }
+
+    .transaction-item {
+        display: block;
+        text-align: left;
+    }
+
+    .transaction-actions {
+        margin-top: 12px;
+        width: 100%;
+    }
+
+    .transaction-actions button {
+        flex: 1;
+        min-width: 90px;
+    }
+
+    #viewSection p {
+        font-size: 15px;
+    }
+
+    #viewSection strong {
+        display: block;
+        min-width: auto;
+        margin-bottom: 4px;
+    }
+
+    .edit-buttons {
+        flex-direction: column;
+    }
+
+    .edit-buttons button {
+        width: 100%;
+        margin: 3px 0;
+    }
+
+}
+

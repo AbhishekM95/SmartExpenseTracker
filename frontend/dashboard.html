@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+   content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard - Smart Expense Tracker</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+```
+<!-- ==============================
+     HEADER
+=============================== -->
+
+<h1>💰 Smart Expense Tracker</h1>
+
+
+<p>
+    Welcome,
+    <span id="dashboardUserName">User</span>! 👋
+</p>
+
+
+<button onclick="logout()">
+    Logout
+</button>
+
+
+<!-- ==============================
+     FINANCIAL SUMMARY
+=============================== -->
+
+<h2>📊 Financial Summary</h2>
+
+
+<div class="summary-cards">
+
+
+    <!-- Balance -->
+
+    <div class="summary-card">
+
+        <h3>💰 Total Balance</h3>
+
+        <p id="balance">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <!-- Income -->
+
+    <div class="summary-card">
+
+        <h3>📈 Total Income</h3>
+
+        <p id="income">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <!-- Expense -->
+
+    <div class="summary-card">
+
+        <h3>📉 Total Expenses</h3>
+
+        <p id="expense">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <!-- Budget -->
+
+    <div class="summary-card">
+
+        <h3>🎯 Total Budget</h3>
+
+        <p id="budget">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <!-- Amount Spent -->
+
+    <div class="summary-card">
+
+        <h3>💸 Amount Spent</h3>
+
+        <p id="budgetSpent">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+    <!-- Remaining Budget -->
+
+    <div class="summary-card">
+
+        <h3>🟢 Remaining Budget</h3>
+
+        <p id="remainingBudget">
+            ₹0.00
+        </p>
+
+    </div>
+
+
+</div>
+
+
+<!-- ==============================
+     QUICK ACTIONS
+=============================== -->
+
+<div class="dashboard-section">
+
+
+    <h2>⚡ Quick Actions</h2>
+
+
+    <div class="dashboard-actions">
+
+
+        <a href="expense.html">
+
+            <button>
+                Add Expense
+            </button>
+
+        </a>
+
+
+        <a href="income.html">
+
+            <button>
+                Add Income
+            </button>
+
+        </a>
+
+
+        <a href="budget.html">
+
+            <button>
+                Manage Budget
+            </button>
+
+        </a>
+
+
+        <a href="reports.html">
+
+            <button>
+                📊 View Reports
+            </button>
+
+        </a>
+
+
+        <a href="suggestions.html">
+
+            <button>
+                💡 Spending Suggestions
+            </button>
+
+        </a>
+
+
+        <a href="transactions.html">
+
+            <button>
+                🧾 All Transactions
+            </button>
+
+        </a>
+
+
+        <a href="category-budget.html">
+
+            <button>
+                📊 Category Budget
+            </button>
+
+        </a>
+
+
+        <a href="profile.html">
+
+            <button>
+                👤 My Profile
+            </button>
+
+        </a>
+
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     RECENT TRANSACTIONS
+=============================== -->
+
+<div class="dashboard-section">
+
+
+    <h2>🧾 Recent Transactions</h2>
+
+
+    <div id="transactions">
+
+        Loading transactions...
+
+    </div>
+
+
+</div>
+```
+
+</div>
+
+<script>
+
+
+// ==============================
+// CHECK LOGIN
+// ==============================
+
+if (!localStorage.getItem("userId")) {
+
+    alert("Please login first.");
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+// ==============================
+// DISPLAY USER NAME
+// ==============================
+
+const storedUserName =
+    localStorage.getItem("userName");
+
+
+if (storedUserName) {
+
+    document.getElementById(
+        "dashboardUserName"
+    ).innerText =
+        storedUserName;
+
+}
+
+
+// ==============================
+// LOAD DASHBOARD SUMMARY
+// ==============================
+
+async function loadDashboard() {
+
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        return;
+
+    }
+
+
+    const data =
+        "userId=" +
+        encodeURIComponent(userId);
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "http://localhost:8081/dashboard",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+                    },
+
+                    body: data
+                }
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Dashboard response:",
+            result
+        );
+
+
+        const values =
+            new URLSearchParams(result);
+
+
+        // Get income
+
+        const income =
+            parseFloat(
+                values.get("income")
+            ) || 0;
+
+
+        // Get expense
+
+        const expense =
+            parseFloat(
+                values.get("expense")
+            ) || 0;
+
+
+        // Get budget
+
+        const budget =
+            parseFloat(
+                values.get("budget")
+            ) || 0;
+
+
+        // Get balance
+
+        const balance =
+            parseFloat(
+                values.get("balance")
+            ) || 0;
+
+
+        // Display income
+
+        document.getElementById(
+            "income"
+        ).innerText =
+            "₹" +
+            income.toFixed(2);
+
+
+        // Display expense
+
+        document.getElementById(
+            "expense"
+        ).innerText =
+            "₹" +
+            expense.toFixed(2);
+
+
+        // Display budget
+
+        document.getElementById(
+            "budget"
+        ).innerText =
+            "₹" +
+            budget.toFixed(2);
+
+
+        // Display balance
+
+        document.getElementById(
+            "balance"
+        ).innerText =
+            "₹" +
+            balance.toFixed(2);
+
+
+        // Calculate remaining budget
+
+        const remainingBudget =
+            budget - expense;
+
+
+        // Display amount spent
+
+        document.getElementById(
+            "budgetSpent"
+        ).innerText =
+            "₹" +
+            expense.toFixed(2);
+
+
+        // Display remaining budget
+
+        document.getElementById(
+            "remainingBudget"
+        ).innerText =
+            "₹" +
+            remainingBudget.toFixed(2);
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        document.getElementById(
+            "transactions"
+        ).innerText =
+            "Cannot connect to Java server.";
+
+    }
+
+}
+
+
+// ==============================
+// LOGOUT
+// ==============================
+
+function logout() {
+
+
+    localStorage.removeItem(
+        "userId"
+    );
+
+
+    localStorage.removeItem(
+        "userName"
+    );
+
+
+    localStorage.removeItem(
+        "userEmail"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+// ==============================
+// LOAD RECENT TRANSACTIONS
+// ==============================
+
+async function loadTransactions() {
+
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        return;
+
+    }
+
+
+    const data =
+        "userId=" +
+        encodeURIComponent(userId);
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "http://localhost:8081/transactions",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+                    },
+
+                    body: data
+                }
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Transactions response:",
+            result
+        );
+
+
+        const transactionsDiv =
+            document.getElementById(
+                "transactions"
+            );
+
+
+        transactionsDiv.innerHTML =
+            "";
+
+
+        // Check if there are no transactions
+
+        if (result.trim() === "") {
+
+
+            transactionsDiv.innerText =
+                "No transactions found.";
+
+
+            return;
+
+        }
+
+
+        // Separate transactions
+
+        const rows =
+            result.trim().split("\n");
+
+
+        // Process transactions
+
+        rows.forEach(function(row) {
+
+
+            const parts =
+                row.split("|");
+
+
+            const type =
+                parts[0];
+
+
+            const category =
+                parts[1];
+
+
+            const amount =
+                parseFloat(parts[2]) || 0;
+
+
+            const date =
+                parts[3];
+
+
+            const description =
+                parts.slice(4).join("|");
+
+
+            // Create transaction element
+
+            const transaction =
+                document.createElement("div");
+
+
+            transaction.className =
+                "transaction-item";
+
+
+            // Display income
+
+            if (type === "INCOME") {
+
+
+                transaction.innerText =
+                    category +
+                    " + ₹" +
+                    amount.toFixed(2) +
+                    " (" +
+                    date +
+                    ")" +
+                    (
+                        description
+                            ? " - " + description
+                            : ""
+                    );
+
+
+            }
+
+
+            // Display expense
+
+            else {
+
+
+                transaction.innerText =
+                    category +
+                    " - ₹" +
+                    amount.toFixed(2) +
+                    " (" +
+                    date +
+                    ")" +
+                    (
+                        description
+                            ? " - " + description
+                            : ""
+                    );
+
+            }
+
+
+            // Add transaction
+
+            transactionsDiv.appendChild(
+                transaction
+            );
+
+
+        });
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        document.getElementById(
+            "transactions"
+        ).innerText =
+            "Cannot load transactions.";
+
+    }
+
+}
+
+
+// ==============================
+// START DASHBOARD
+// ==============================
+
+if (
+    localStorage.getItem("userId")
+) {
+
+
+    loadDashboard();
+
+
+    loadTransactions();
+
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Add Expense - Smart Expense Tracker</title>
+
+<link rel="stylesheet" href="css/style.css">
+```
+
+</head>
+
+<body>
+
+```
+<div class="container">
+
+    <h1>💸 Add Expense</h1>
+
+    <p>Enter your expense details below.</p>
+
+
+    <form id="expenseForm">
+
+        <!-- Expense Amount -->
+
+        <label for="amount">
+            <strong>Amount:</strong>
+        </label>
+
+        <br>
+
+        <input
+            type="number"
+            id="amount"
+            placeholder="Enter expense amount"
+            min="0.01"
+            step="0.01"
+            required
+        >
+
+        <br><br>
+
+
+        <!-- Expense Category -->
+
+        <label for="category">
+            <strong>Category:</strong>
+        </label>
+
+        <br>
+
+        <select id="category" required>
+
+            <option value="">
+                Select Category
+            </option>
+
+            <option value="1">Food</option>
+            <option value="2">Shopping</option>
+            <option value="3">Transport</option>
+            <option value="4">Education</option>
+            <option value="5">Health</option>
+            <option value="6">Entertainment</option>
+            <option value="7">Other</option>
+
+        </select>
+
+        <br><br>
+
+
+        <!-- Expense Date -->
+
+        <label for="expenseDate">
+            <strong>Date:</strong>
+        </label>
+
+        <br>
+
+        <input
+            type="date"
+            id="expenseDate"
+            required
+        >
+
+        <br><br>
+
+
+        <!-- Description -->
+
+        <label for="description">
+            <strong>Description:</strong>
+        </label>
+
+        <br>
+
+        <textarea
+            id="description"
+            placeholder="Enter expense description"
+            rows="4"
+            cols="30"
+            maxlength="255"></textarea>
+
+        <br>
+
+        <small>
+            Maximum 255 characters
+        </small>
+
+        <br><br>
+
+
+        <!-- Submit -->
+
+        <button type="submit">
+            💾 Add Expense
+        </button>
+
+    </form>
+
+
+    <p id="message"></p>
+
+
+    <br>
+
+
+    <a href="dashboard.html">
+        <button type="button">
+            ← Back to Dashboard
+        </button>
+    </a>
+
+</div>
+
+
+<script>
+
+    // ==============================
+    // CHECK LOGIN
+    // ==============================
+
+    const loggedInUser =
+        localStorage.getItem("userId");
+
+
+    if (!loggedInUser) {
+
+        alert("Please login first.");
+
+        window.location.href =
+            "login.html";
+
+    }
+
+
+    // ==============================
+    // EXPENSE FORM
+    // ==============================
+
+    const expenseForm =
+        document.getElementById("expenseForm");
+
+
+    /*
+     * Prevent selecting a future date
+     */
+
+    const today =
+        new Date().toISOString().split("T")[0];
+
+
+    document.getElementById("expenseDate").max =
+        today;
+
+
+    expenseForm.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            /*
+             * Get logged-in user's ID
+             */
+
+            const userId =
+                localStorage.getItem("userId");
+
+
+            /*
+             * Get form values
+             */
+
+            const amount =
+                document.getElementById("amount").value;
+
+
+            const categoryId =
+                document.getElementById("category").value;
+
+
+            const expenseDate =
+                document.getElementById("expenseDate").value;
+
+
+            const description =
+                document.getElementById("description")
+                    .value
+                    .trim();
+
+
+            const message =
+                document.getElementById("message");
+
+
+            /*
+             * Check login
+             */
+
+            if (!userId) {
+
+                message.innerText =
+                    "Please login first.";
+
+                return;
+
+            }
+
+
+            /*
+             * Validate amount
+             */
+
+            if (Number(amount) <= 0) {
+
+                message.innerText =
+                    "Amount must be greater than ₹0.";
+
+                return;
+
+            }
+
+
+            /*
+             * Validate category
+             */
+
+            if (!categoryId) {
+
+                message.innerText =
+                    "Please select a category.";
+
+                return;
+
+            }
+
+
+            /*
+             * Validate date
+             */
+
+            if (!expenseDate) {
+
+                message.innerText =
+                    "Please select a date.";
+
+                return;
+
+            }
+
+
+            if (expenseDate > today) {
+
+                message.innerText =
+                    "Future dates are not allowed.";
+
+                return;
+
+            }
+
+
+            /*
+             * Prepare data
+             */
+
+            const data =
+                "userId=" +
+                encodeURIComponent(userId) +
+
+                "&categoryId=" +
+                encodeURIComponent(categoryId) +
+
+                "&amount=" +
+                encodeURIComponent(amount) +
+
+                "&expenseDate=" +
+                encodeURIComponent(expenseDate) +
+
+                "&description=" +
+                encodeURIComponent(description);
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "http://localhost:8081/expense",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body: data
+                        }
+                    );
+
+
+                const result =
+                    await response.text();
+
+
+                message.innerText =
+                    result;
+
+
+                /*
+                 * Clear form after
+                 * successful submission
+                 */
+
+                if (response.ok) {
+
+                    expenseForm.reset();
+
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.innerText =
+                    "Cannot connect to Java server.";
+
+            }
+
+        }
+    );
+
+</script>
+```
+
+</body>
+
+</html>

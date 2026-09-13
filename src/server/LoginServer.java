@@ -10,6 +10,7 @@ import model.Budget;
 import model.Transaction;
 import model.CategorySummary;
 import model.MonthlySummary;
+import model.CategoryBudget;
 
 import service.UserService;
 import service.ExpenseService;
@@ -20,10 +21,7 @@ import service.TransactionService;
 import service.ReportService;
 import service.SuggestionService;
 import service.MonthlySummaryService;
-import model.CategoryBudget;
 import service.CategoryBudgetService;
-
-import java.util.List;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +37,18 @@ public class LoginServer {
 
     public static void main(String[] args) throws IOException {
 
+        // =====================================================
+        // SERVER PORT
+        // =====================================================
+
+        String host = "0.0.0.0";
+
+        int port = Integer.parseInt(
+                System.getenv().getOrDefault("PORT", "8081")
+        );
+
         HttpServer server = HttpServer.create(
-                new InetSocketAddress(8081),
+                new InetSocketAddress(host, port),
                 0
         );
 
@@ -123,16 +131,15 @@ public class LoginServer {
                 LoginServer::handleDeleteIncome
         );
 
-        // NEW MONTHLY SUMMARY ENDPOINT
         server.createContext(
                 "/monthly-summary",
                 LoginServer::handleMonthlySummary
         );
+
         server.createContext(
                 "/category-budgets",
                 LoginServer::handleCategoryBudgets
         );
-
 
         server.setExecutor(null);
 
@@ -140,7 +147,7 @@ public class LoginServer {
 
         System.out.println("Login server started!");
         System.out.println(
-                "Open: http://localhost:8081/login"
+                "Server running on port: " + port
         );
     }
 
@@ -1637,15 +1644,29 @@ public class LoginServer {
 
         outputStream.close();
     }
+
+
+    // =========================================================
+    // CATEGORY BUDGETS
+    // =========================================================
+
     private static void handleCategoryBudgets(
-            HttpExchange exchange) throws IOException {
+            HttpExchange exchange)
+            throws IOException {
 
         Map<String, String> params =
-                getQueryParams(exchange.getRequestURI().getQuery());
+                getQueryParams(
+                        exchange.getRequestURI()
+                                .getQuery()
+                );
 
-        int userId = Integer.parseInt(
-                params.getOrDefault("userId", "0")
-        );
+        int userId =
+                Integer.parseInt(
+                        params.getOrDefault(
+                                "userId",
+                                "0"
+                        )
+                );
 
         CategoryBudgetService service =
                 new CategoryBudgetService();
@@ -1656,7 +1677,8 @@ public class LoginServer {
         StringBuilder response =
                 new StringBuilder();
 
-        for (CategoryBudget budget : budgets) {
+        for (CategoryBudget budget :
+                budgets) {
 
             response.append(
                     budget.getCategory()

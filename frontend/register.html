@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register - Smart Expense Tracker</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <h1>Create Account</h1>
+
+    <form id="registerForm">
+
+        <label>Full Name:</label>
+        <br>
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Enter your name"
+            required
+        >
+
+        <br><br>
+
+        <label>Email:</label>
+        <br>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+        >
+
+        <br><br>
+
+        <label>Password:</label>
+        <br>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Create password"
+            required
+        >
+
+        <br><br>
+
+        <label>Confirm Password:</label>
+        <br>
+
+        <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm password"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">Register</button>
+
+    </form>
+
+    <p id="message"></p>
+
+    <p>Already have an account?</p>
+
+    <a href="login.html">Login</a>
+
+    <br><br>
+
+    <a href="index.html">Back to Home</a>
+
+
+    <script>
+
+        document.getElementById("registerForm").addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+
+                document.getElementById("message").innerText =
+                    "Passwords do not match!";
+
+                return;
+            }
+
+            const data =
+                "name=" + encodeURIComponent(name) +
+                "&email=" + encodeURIComponent(email) +
+                "&password=" + encodeURIComponent(password);
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8081/register",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: data
+                    }
+                );
+
+                const result = await response.text();
+
+                document.getElementById("message").innerText = result;
+
+            } catch (error) {
+
+                document.getElementById("message").innerText =
+                    "Cannot connect to Java server.";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

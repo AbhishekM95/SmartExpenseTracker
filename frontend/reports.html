@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Reports - Smart Expense Tracker</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- ==============================
+         HEADER
+    =============================== -->
+
+    <h1>📊 Financial Reports</h1>
+
+    <p>Analyze your income and spending by category.</p>
+
+
+    <!-- ==============================
+         MONTHLY SUMMARY
+    =============================== -->
+
+    <div class="report-section">
+
+        <h2>📅 Monthly Expense Summary</h2>
+
+        <div style="
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        ">
+
+            <select id="monthSelect">
+
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+
+            </select>
+
+
+            <select id="yearSelect">
+
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+
+            </select>
+
+
+            <button onclick="loadMonthlySummary()">
+                View Summary
+            </button>
+
+        </div>
+
+
+        <!-- SUMMARY CARDS -->
+
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        ">
+
+
+            <!-- INCOME -->
+
+            <div style="
+                padding: 20px;
+                border-radius: 10px;
+                background: #f5f5f5;
+                text-align: center;
+            ">
+
+                <h3>💰 Total Income</h3>
+
+                <p id="monthlyIncome"
+                   style="font-size: 20px; font-weight: bold;">
+
+                    ₹0.00
+
+                </p>
+
+            </div>
+
+
+            <!-- EXPENSE -->
+
+            <div style="
+                padding: 20px;
+                border-radius: 10px;
+                background: #f5f5f5;
+                text-align: center;
+            ">
+
+                <h3>💸 Total Expenses</h3>
+
+                <p id="monthlyExpense"
+                   style="font-size: 20px; font-weight: bold;">
+
+                    ₹0.00
+
+                </p>
+
+            </div>
+
+
+            <!-- SAVINGS -->
+
+            <div style="
+                padding: 20px;
+                border-radius: 10px;
+                background: #f5f5f5;
+                text-align: center;
+            ">
+
+                <h3>💵 Savings</h3>
+
+                <p id="monthlySavings"
+                   style="font-size: 20px; font-weight: bold;">
+
+                    ₹0.00
+
+                </p>
+
+            </div>
+
+
+            <!-- TRANSACTIONS -->
+
+            <div style="
+                padding: 20px;
+                border-radius: 10px;
+                background: #f5f5f5;
+                text-align: center;
+            ">
+
+                <h3>🔢 Transactions</h3>
+
+                <p id="monthlyTransactions"
+                   style="font-size: 20px; font-weight: bold;">
+
+                    0
+
+                </p>
+
+            </div>
+
+
+            <!-- HIGHEST CATEGORY -->
+
+            <div style="
+                padding: 20px;
+                border-radius: 10px;
+                background: #f5f5f5;
+                text-align: center;
+            ">
+
+                <h3>🏆 Highest Spending</h3>
+
+                <p id="monthlyCategory"
+                   style="font-size: 20px; font-weight: bold;">
+
+                    None
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         EXPENSE REPORT
+    =============================== -->
+
+    <div class="report-section">
+
+        <h2>📉 Expense Report</h2>
+
+        <div id="expenseReport"
+             class="report-list">
+
+            Loading expense report...
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="expenseChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         INCOME REPORT
+    =============================== -->
+
+    <div class="report-section">
+
+        <h2>📈 Income Report</h2>
+
+        <div id="incomeReport"
+             class="report-list">
+
+            Loading income report...
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="incomeChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         BACK TO DASHBOARD
+    =============================== -->
+
+    <div class="report-back">
+
+        <a href="dashboard.html">
+
+            <button>
+                ← Back to Dashboard
+            </button>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+// =====================================
+// CHECK LOGIN
+// =====================================
+
+const loggedInUser =
+    localStorage.getItem("userId");
+
+
+if (!loggedInUser) {
+
+    alert("Please login first.");
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+// =====================================
+// SET CURRENT MONTH AND YEAR
+// =====================================
+
+const currentDate =
+    new Date();
+
+document.getElementById("monthSelect").value =
+    currentDate.getMonth() + 1;
+
+document.getElementById("yearSelect").value =
+    currentDate.getFullYear();
+
+
+// =====================================
+// LOAD MONTHLY SUMMARY
+// =====================================
+
+async function loadMonthlySummary() {
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        return;
+
+    }
+
+
+    const month =
+        document.getElementById(
+            "monthSelect"
+        ).value;
+
+
+    const year =
+        document.getElementById(
+            "yearSelect"
+        ).value;
+
+
+    try {
+
+        const url =
+            "http://localhost:8081/monthly-summary"
+            + "?userId="
+            + encodeURIComponent(userId)
+            + "&month="
+            + encodeURIComponent(month)
+            + "&year="
+            + encodeURIComponent(year);
+
+
+        const response =
+            await fetch(url);
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Monthly summary response:",
+            result
+        );
+
+
+        const parts =
+            result.trim().split("|");
+
+
+        if (parts.length < 5) {
+
+            throw new Error(
+                "Invalid monthly summary response"
+            );
+
+        }
+
+
+        const totalIncome =
+            parseFloat(parts[0]) || 0;
+
+
+        const totalExpense =
+            parseFloat(parts[1]) || 0;
+
+
+        const savings =
+            parseFloat(parts[2]) || 0;
+
+
+        const transactionCount =
+            parseInt(parts[3]) || 0;
+
+
+        const highestCategory =
+            parts[4] || "None";
+
+
+        // =================================
+        // DISPLAY SUMMARY
+        // =================================
+
+        document.getElementById(
+            "monthlyIncome"
+        ).innerText =
+            "₹" +
+            totalIncome.toFixed(2);
+
+
+        document.getElementById(
+            "monthlyExpense"
+        ).innerText =
+            "₹" +
+            totalExpense.toFixed(2);
+
+
+        document.getElementById(
+            "monthlySavings"
+        ).innerText =
+            "₹" +
+            savings.toFixed(2);
+
+
+        document.getElementById(
+            "monthlyTransactions"
+        ).innerText =
+            transactionCount;
+
+
+        document.getElementById(
+            "monthlyCategory"
+        ).innerText =
+            highestCategory;
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "Cannot load monthly summary."
+        );
+
+    }
+
+}
+
+
+// =====================================
+// LOAD REPORTS
+// =====================================
+
+async function loadReports() {
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        return;
+
+    }
+
+
+    const data =
+        "userId=" +
+        encodeURIComponent(userId);
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:8081/reports",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+                    },
+
+                    body: data
+                }
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Reports response:",
+            result
+        );
+
+
+        const expenseReport =
+            document.getElementById(
+                "expenseReport"
+            );
+
+
+        const incomeReport =
+            document.getElementById(
+                "incomeReport"
+            );
+
+
+        expenseReport.innerHTML = "";
+
+        incomeReport.innerHTML = "";
+
+
+        // =====================================
+        // CHART DATA ARRAYS
+        // =====================================
+
+        const expenseCategories = [];
+
+        const expenseAmounts = [];
+
+        const incomeCategories = [];
+
+        const incomeAmounts = [];
+
+
+        // =====================================
+        // NO DATA CHECK
+        // =====================================
+
+        if (result.trim() === "") {
+
+            expenseReport.innerText =
+                "No expense data found.";
+
+            incomeReport.innerText =
+                "No income data found.";
+
+            return;
+
+        }
+
+
+        // =====================================
+        // CONVERT RESPONSE INTO ROWS
+        // =====================================
+
+        const rows =
+            result.trim().split("\n");
+
+
+        // =====================================
+        // PROCESS EACH REPORT ROW
+        // =====================================
+
+        rows.forEach(function(row) {
+
+            const parts =
+                row.split("|");
+
+
+            const type =
+                parts[0];
+
+
+            const category =
+                parts[1];
+
+
+            const amount =
+                parseFloat(parts[2]) || 0;
+
+
+            const paragraph =
+                document.createElement("p");
+
+
+            paragraph.innerText =
+                category +
+                " : ₹" +
+                amount.toFixed(2);
+
+
+            // =================================
+            // EXPENSE
+            // =================================
+
+            if (type === "EXPENSE") {
+
+                expenseReport.appendChild(
+                    paragraph
+                );
+
+
+                expenseCategories.push(
+                    category
+                );
+
+
+                expenseAmounts.push(
+                    amount
+                );
+
+            }
+
+
+            // =================================
+            // INCOME
+            // =================================
+
+            if (type === "INCOME") {
+
+                incomeReport.appendChild(
+                    paragraph
+                );
+
+
+                incomeCategories.push(
+                    category
+                );
+
+
+                incomeAmounts.push(
+                    amount
+                );
+
+            }
+
+        });
+
+
+        // =====================================
+        // CHECK EXPENSE DATA
+        // =====================================
+
+        if (expenseReport.innerHTML === "") {
+
+            expenseReport.innerText =
+                "No expense data found.";
+
+        }
+
+
+        // =====================================
+        // CHECK INCOME DATA
+        // =====================================
+
+        if (incomeReport.innerHTML === "") {
+
+            incomeReport.innerText =
+                "No income data found.";
+
+        }
+
+
+        // =====================================
+        // EXPENSE PIE CHART
+        // =====================================
+
+        if (expenseCategories.length > 0) {
+
+            new Chart(
+
+                document.getElementById(
+                    "expenseChart"
+                ),
+
+                {
+
+                    type: "pie",
+
+                    data: {
+
+                        labels:
+                            expenseCategories,
+
+                        datasets: [
+
+                            {
+
+                                label:
+                                    "Expenses",
+
+                                data:
+                                    expenseAmounts
+
+                            }
+
+                        ]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        plugins: {
+
+                            title: {
+
+                                display: true,
+
+                                text:
+                                    "Expenses by Category"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+        }
+
+
+        // =====================================
+        // INCOME PIE CHART
+        // =====================================
+
+        if (incomeCategories.length > 0) {
+
+            new Chart(
+
+                document.getElementById(
+                    "incomeChart"
+                ),
+
+                {
+
+                    type: "pie",
+
+                    data: {
+
+                        labels:
+                            incomeCategories,
+
+                        datasets: [
+
+                            {
+
+                                label:
+                                    "Income",
+
+                                data:
+                                    incomeAmounts
+
+                            }
+
+                        ]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        plugins: {
+
+                            title: {
+
+                                display: true,
+
+                                text:
+                                    "Income by Category"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+            "expenseReport"
+        ).innerText =
+            "Cannot connect to Java server.";
+
+
+        document.getElementById(
+            "incomeReport"
+        ).innerText =
+            "Cannot connect to Java server.";
+
+    }
+
+}
+
+
+// =====================================
+// START
+// =====================================
+
+if (localStorage.getItem("userId")) {
+
+    loadReports();
+
+    loadMonthlySummary();
+
+}
+
+</script>
+
+</body>
+
+</html>

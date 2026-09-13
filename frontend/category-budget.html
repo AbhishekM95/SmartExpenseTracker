@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Category Budget</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>📊 Category-wise Budget</h1>
+
+    <p>
+        Check your budget and spending for each category.
+    </p>
+
+
+    <div id="budgetList">
+
+        Loading category budgets...
+
+    </div>
+
+
+    <br>
+
+
+    <a href="dashboard.html">
+
+        <button>
+            ← Back to Dashboard
+        </button>
+
+    </a>
+
+</div>
+
+
+<script>
+
+
+// =====================================
+// CHECK LOGIN
+// =====================================
+
+const userId =
+    localStorage.getItem("userId");
+
+
+if (!userId) {
+
+    alert("Please login first.");
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+// =====================================
+// LOAD CATEGORY BUDGETS
+// =====================================
+
+async function loadCategoryBudgets() {
+
+    const userId =
+        localStorage.getItem("userId");
+
+
+    if (!userId) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:8081/category-budgets"
+                + "?userId="
+                + encodeURIComponent(userId)
+            );
+
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Category budget response:",
+            result
+        );
+
+
+        const budgetList =
+            document.getElementById(
+                "budgetList"
+            );
+
+
+        budgetList.innerHTML = "";
+
+
+        if (result.trim() === "") {
+
+            budgetList.innerText =
+                "No category budget data found.";
+
+            return;
+
+        }
+
+
+        const rows =
+            result.trim().split("\n");
+
+
+        rows.forEach(function(row) {
+
+            const parts =
+                row.split("|");
+
+
+            if (parts.length < 4) {
+
+                return;
+
+            }
+
+
+            const category =
+                parts[0];
+
+
+            const budget =
+                parseFloat(parts[1]) || 0;
+
+
+            const spent =
+                parseFloat(parts[2]) || 0;
+
+
+            const remaining =
+                parseFloat(parts[3]) || 0;
+
+
+            const card =
+                document.createElement("div");
+
+
+            card.style.padding =
+                "20px";
+
+            card.style.marginBottom =
+                "15px";
+
+            card.style.borderRadius =
+                "10px";
+
+            card.style.background =
+                "#f5f5f5";
+
+
+            let status = "";
+
+
+            if (budget === 0) {
+
+                status =
+                    "No budget set";
+
+            }
+
+            else if (spent > budget) {
+
+                status =
+                    "⚠️ OVER BUDGET";
+
+            }
+
+            else {
+
+                status =
+                    "✅ Within Budget";
+
+            }
+
+
+            // Calculate percentage spent
+
+let percentage = 0;
+
+if (budget > 0) {
+    percentage = (spent / budget) * 100;
+}
+
+if (percentage > 100) {
+    percentage = 100;
+}
+
+
+// Progress bar
+
+let progressWidth = percentage;
+
+
+// Display remaining / over budget
+
+let remainingText = "";
+
+if (remaining >= 0) {
+
+    remainingText =
+        "₹" +
+        remaining.toFixed(2) +
+        " remaining";
+
+} else {
+
+    remainingText =
+        "₹" +
+        Math.abs(remaining).toFixed(2) +
+        " over budget";
+}
+
+
+// Create card
+
+card.innerHTML =
+
+    "<h2>" +
+    category +
+    "</h2>" +
+
+    "<p><strong>Budget:</strong> ₹" +
+    budget.toFixed(2) +
+    "</p>" +
+
+    "<p><strong>Spent:</strong> ₹" +
+    spent.toFixed(2) +
+    "</p>" +
+
+    "<div style='" +
+        "width:100%;" +
+        "height:20px;" +
+        "background:#ddd;" +
+        "border-radius:10px;" +
+        "overflow:hidden;" +
+        "margin:10px 0;" +
+    "'>" +
+
+        "<div style='" +
+            "width:" +
+            progressWidth +
+            "%;" +
+            "height:100%;" +
+            "background:#4caf50;" +
+        "'></div>" +
+
+    "</div>" +
+
+    "<p>" +
+    percentage.toFixed(1) +
+    "% spent" +
+    "</p>" +
+
+    "<p><strong>" +
+    remainingText +
+    "</strong></p>" +
+
+    "<p><strong>Status:</strong> " +
+    status +
+    "</p>";
+
+
+            budgetList.appendChild(card);
+
+        });
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+            "budgetList"
+        ).innerText =
+            "Cannot connect to Java server.";
+
+    }
+
+}
+
+
+// =====================================
+// START
+// =====================================
+
+if (localStorage.getItem("userId")) {
+
+    loadCategoryBudgets();
+
+}
+
+</script>
+
+</body>
+
+</html>
